@@ -91,4 +91,11 @@ Below are descriptions of several common extensions to the EPG model:
     *   `grad_spoil`: A factor (e.g., 0 to 1, or a complex number for phase effects) applied to F states during spoiling.
     *   Detailed characterization of gradient deviations if more accurate modeling is needed.
 
+### 8. Slice Profile Effects
+
+*   **Phenomenon:** Real-world RF pulses do not excite perfectly rectangular slices. The actual flip angle often varies across the slice thickness, and spins outside the nominal slice may be partially excited.
+*   **EPG Incorporation:** One common method is to discretize the slice into several sub-slices, each experiencing a different effective flip angle based on its position within the RF pulse's profile. The EPG simulation is then run for each sub-slice (often in parallel using batching), and the total signal is an average or sum over these sub-slices. For more details, see [[Slice Profile EPG Models|./epg_slice_profiles.md]].
+*   **Key Parameters:**
+    *   `slice_profile_factors`: A set of scaling factors representing the effective flip angle at different points across the slice.
+
 These extensions can be combined to create sophisticated EPG models that simulate a wide range of MRI physics and artifacts.
