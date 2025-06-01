@@ -78,6 +78,8 @@ The primary simulation scripts are found in the `vectorized-sims/` directory:
     *   Key parameter: `max_mqc_order`.
 *   **`epg_mr_mt_gpu_vectorized.py`**: Two-pool Magnetization Transfer simulation, batched and optimized for GPU.
     *   `forward(flip_angles, phases, T1f, T2f, T1b, T2b, kf, kb, TR, TE, B0=0.0, B1=1.0, wf=1.0, wb=0.1)`
+*   **`epg_mri_time_varying_gradients.py`**: EPG simulation extended to support time-varying gradients (placeholder for full implementation), batched.
+    *   Key parameters: `gradient_waveform`.
 
 Refer to the example usage within each script and the documentation in the `wiki/` for more details on parameters.
 
