@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+SCRIPT_VERSION_INFO = "epg_mri_v2_RF_first"
+
 class EPGSimulation(nn.Module):
     """
     Extended Phase Graph (EPG) simulation for MRI.
@@ -64,17 +66,20 @@ class EPGSimulation(nn.Module):
         phi_b0_val = 2 * torch.pi * B0_val * TR / 1000.0 # Renamed
 
         for i in range(N):
-            # 1. Relaxation and dephasing
-            Fp, Fm, Z = self.relax(Fp, Fm, Z, E1, E2)
-            Fp, Fm = self.apply_b0(Fp, Fm, phi_b0_val) # Use renamed variable
+            # Order for v2: RF -> Relax -> B0 -> Shift
 
-            # 2. Apply RF pulse (flip angle and phase, possibly B1 scaled)
-            # alpha and beta are per pulse, but B1_val can be per batch item
-            alpha = flip_angles[i] * B1_val # alpha is now (batch_size, 1)
-            beta = phases[i] # beta is a scalar for this pulse
+            # 1. Apply RF pulse
+            alpha = flip_angles[i] * B1_val
+            beta = phases[i]
             Fp, Fm, Z = self.apply_rf(Fp, Fm, Z, alpha, beta)
 
-            # 3. EPG shift (gradient dephasing)
+            # 2. Relaxation
+            Fp, Fm, Z = self.relax(Fp, Fm, Z, E1, E2)
+
+            # 3. B0 dephasing
+            Fp, Fm = self.apply_b0(Fp, Fm, phi_b0_val)
+
+            # 4. EPG shift (gradient dephasing)
             Fp, Fm, Z = self.epg_shift(Fp, Fm, Z)
 
             # Store current state

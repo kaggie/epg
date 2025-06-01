@@ -78,10 +78,36 @@ The primary simulation scripts are found in the `vectorized-sims/` directory:
     *   Key parameter: `max_mqc_order`.
 *   **`epg_mr_mt_gpu_vectorized.py`**: Two-pool Magnetization Transfer simulation, batched and optimized for GPU.
     *   `forward(flip_angles, phases, T1f, T2f, T1b, T2b, kf, kb, TR, TE, B0=0.0, B1=1.0, wf=1.0, wb=0.1)`
+*   **`epg_mri_time_varying_gradients.py`**: EPG simulation extended to support time-varying gradients (placeholder for full implementation), batched.
+    *   Key parameters: `gradient_waveform`.
 
 Refer to the example usage within each script and the documentation in the `wiki/` for more details on parameters.
 
 *(Note: Plotting utilities like `epg_plotting_tools` might exist or be developed separately.)*
+
+---
+
+## Plotting Utilities
+
+The `epg_plotting_tool.py` script (located at the root of the repository) provides functions to visualize EPG simulation results and pulse sequences:
+
+*   `plot_pulse_sequence(flip_angles, phases, TR)`: Displays the RF pulse sequence.
+*   `plot_epg_evolution(epg_states, max_display_order, batch_idx, pool_idx)`: Shows the time evolution of different k-orders for Fp, Fm, and Z states (2D plot).
+*   `plot_epg_snapshot(epg_states, time_step_idx, batch_idx, pool_idx, max_k_order)`: Displays a snapshot of Fp(k), Fm(k), and Z(k) magnitudes vs. k-order at a specific time point (2D plot).
+*   `plot_epg_F_states_3D(epg_states, batch_idx, pool_idx, component, kind)`: Provides a 3D visualization of F-state magnitudes (Fp, Fm, or both) over time and k-order (e.g., as a surface or wireframe plot).
+
+These utilities are demonstrated in the Jupyter notebooks located in the `examples/` directory.
+
+---
+
+## Examples
+
+The `examples/` directory contains Jupyter notebooks (derived from Python scripts) that demonstrate how to use the EPG simulation scripts and plotting utilities:
+
+*   **`example_basic_epg.ipynb`**: Shows how to run a basic EPG simulation using `vectorized-sims/epg_mri_vectorized.py` and visualize the pulse sequence, 2D EPG state evolution, 2D state snapshots, and 3D F-state plots.
+*   **`example_extended_epg.ipynb`**: Demonstrates an EPG simulation with Magnetization Transfer (MT) using `vectorized-sims/epg_extended_vectorized.py`. It includes visualizations for different pools and highlights MT effects.
+
+To run these examples, ensure you have Jupyter Notebook or JupyterLab installed (e.g., `pip install notebook jupyterlab`). The Python scripts (`.py`) in the `examples/` directory can be converted to notebooks (e.g., using `jupytext` or by opening them in VS Code with the Jupyter extension) or run directly, though notebooks offer a more interactive experience for visualization.
 
 ---
 
