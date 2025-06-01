@@ -1,6 +1,8 @@
-# EPG: Extended Phase Graph Simulator for MRI
+# EPG: Extended Phase Graph Simulations for MRI
 
-**epg** is a Python library for simulation of MRI signal evolution using the Extended Phase Graph (EPG) formalism. It supports single- and multi-pool models, magnetization transfer (MT), chemical exchange (CEST), multiple quantum coherences (MQC), and more. The package is designed for research and educational use in quantitative MRI, pulse sequence development, and relaxation/exchange studies.
+This repository provides Python-based tools for simulating MRI signal evolution using the Extended Phase Graph (EPG) formalism. It includes both original non-vectorized scripts and newer, optimized versions that support batched (vectorized) inputs for efficient simulation of various scenarios, including Magnetization Transfer (MT) and Multiple Quantum Coherences (MQC). The simulations can leverage GPU acceleration if a CUDA-enabled GPU and PyTorch are correctly configured.
+
+The primary goal of this project is to offer tools for research, education, and development in quantitative MRI, pulse sequence design, and understanding complex MR phenomena.
 
 ---
 
@@ -16,86 +18,73 @@ Key references:
 
 ---
 
-## Installation
+## Repository Structure
 
-**Dependencies:**  
-- Python >= 3.8
-- numpy
-- matplotlib
-- torch (for GPU support)
+The repository is organized as follows:
 
-**Install via pip:**
-```bash
-pip install git+https://github.com/kaggie/epg.git
-```
-
-**Or clone and install locally:**
-```bash
-git clone https://github.com/kaggie/epg.git
-cd epg
-pip install -e .
-```
+*   **`non-parallelized-sims/`**: Contains the original EPG simulation scripts. These are generally simpler to understand for basic EPG concepts but are not optimized for batch processing or speed.
+*   **`vectorized-sims/`**: Contains newer, optimized EPG simulation scripts. These versions support batched inputs (allowing multiple parameter sets to be simulated simultaneously) and can run efficiently on CPUs or GPUs (via PyTorch). This is the recommended location for most current simulation tasks.
+*   **`wiki/`**: Contains detailed Markdown-based documentation on the different EPG models implemented:
+    *   `basic_epg_model.md`: Explanation of the fundamental EPG model.
+    *   `mt_epg_model.md`: Details on the EPG model for Magnetization Transfer.
+    *   `mqc_epg_model.md`: Information on the EPG model for Multiple Quantum Coherences.
+    *   `extended_epg_model.md`: Overview of various extensions to the EPG formalism.
+*   `background.md`: A general introduction to the EPG formalism, its importance, and core concepts.
+*   `ideas.md`: A list of potential future improvements and ideas for this project.
 
 ---
 
-## Usage Example
+## Getting Started
 
-### Basic EPG Simulation
+1.  **Understand EPG:**
+    *   For a general introduction to EPG, start with [`background.md`](./background.md).
+    *   For detailed explanations of specific models, refer to the documents in the [`wiki/`](./wiki/) folder.
 
-```python
-import torch
-from epg_mri import EPGSimulation
+2.  **Using the Simulations:**
+    *   The latest, optimized, and batched simulations are located in the [`vectorized-sims/`](./vectorized-sims/) folder. Check the `if __name__ == "__main__":` block within each script for example usage.
+    *   The original, non-vectorized scripts are in [`non-parallelized-sims/`](./non-parallelized-sims/) and can be useful for understanding the basic EPG algorithm steps in a simpler context.
 
-n_pulses = 10
-flip_angles = torch.ones(n_pulses) * torch.deg2rad(torch.tensor(90.0))
-phases = torch.zeros(n_pulses)
-T1, T2 = 1000.0, 80.0  # ms
-TR, TE = 500.0, 20.0   # ms
+3.  **Dependencies:**
+    *   Python >= 3.8
+    *   PyTorch (required for all simulations, enables CPU/GPU execution)
+    *   NumPy (often used by PyTorch or for utility)
+    *   (Optional, if used by specific scripts) Matplotlib for plotting.
 
-epg = EPGSimulation(n_states=21)
-states = epg(flip_angles, phases, T1, T2, TR, TE)
-
-for i, (Fp, Fm, Z) in enumerate(states):
-    print(f"Pulse {i+1}: Fp={Fp[0].real:.4f}, Z={Z[0]:.4f}")
-```
-
-### Magnetization Transfer (MT) Simulation
-
-```python
-from epg_mri_mt import EPGSimulationMT
-
-epg_mt = EPGSimulationMT(n_states=21)
-states = epg_mt(
-    flip_angles, phases,
-    T1f=1000, T2f=80, T1b=1000, T2b=10,
-    kf=3.0, kb=6.0,
-    TR=500, TE=20,
-    wf=0.9, wb=0.1
-)
-```
-
-### GPU Acceleration
-
-```python
-epg = EPGSimulationMT(n_states=21, device='cuda')
-# All tensors and computation will run on GPU if available
-```
-
-### Pulse Sequence Visualization
-
-```python
-from epg_plotting_tools import plot_pulse_sequence
-plot_pulse_sequence(flip_angles, phases, TR=5.0)
-```
+4.  **Running Simulations:**
+    *   Clone this repository:
+        ```bash
+        git clone <repository_url>
+        cd <repository_name>
+        ```
+    *   Ensure you have PyTorch installed (e.g., `pip install torch torchvision torchaudio`).
+    *   You can then run the simulation scripts directly, e.g.:
+        ```bash
+        python vectorized-sims/epg_mri_vectorized.py
+        ```
+    *   The device for computation (CPU or GPU) is typically determined automatically within the scripts or can be set as a parameter.
 
 ---
 
-## API Documentation
+## Simulation Scripts Overview
 
-- **EPGSimulation**: Standard EPG for single-pool systems.
-    - `forward(flip_angles, phases, T1, T2, TR, TE, B0=0., B1=1.0)`
-- **EPGSimulationMT**: Two-pool Magnetization Transfer simulation.
-    - `forward(flip_angles, phases, T1f, T2f, T1b, T2b, kf, kb, TR, TE, B0=0., B1=1.0, wf=1.0, wb=0.1)`
-- **EPGSimulationMQC**: EPG with Multiple Quantum Coherences.
-    - `forward(flip_angles, phases, T1, T2, TR, TE, B0=0., B1=1.0)`
-- **plot_epg_evolution, plot_pulse_sequence**: Visualization utilities.
+The primary simulation scripts are found in the `vectorized-sims/` directory:
+
+*   **`epg_mri_vectorized.py`**: Standard EPG for single-pool systems, supporting batched inputs.
+    *   `forward(flip_angles, phases, T1, T2, TR, TE, B0=0.0, B1=1.0)`
+*   **`epg_extended_vectorized.py`**: Extended EPG model incorporating MT, diffusion, flow, etc., with batched inputs.
+    *   Key parameters include those for relaxation, exchange, diffusion (`D`, `bval`), flow (`v`), etc.
+*   **`epg_mqc_vectorized.py`**: EPG simulation with Multiple Quantum Coherences, batched.
+    *   `forward(flip_angles, phases, T1, T2, TR, TE, B0=0.0, B1=1.0)`
+    *   Key parameter: `max_mqc_order`.
+*   **`epg_mr_mt_gpu_vectorized.py`**: Two-pool Magnetization Transfer simulation, batched and optimized for GPU.
+    *   `forward(flip_angles, phases, T1f, T2f, T1b, T2b, kf, kb, TR, TE, B0=0.0, B1=1.0, wf=1.0, wb=0.1)`
+
+Refer to the example usage within each script and the documentation in the `wiki/` for more details on parameters.
+
+*(Note: Plotting utilities like `epg_plotting_tools` might exist or be developed separately.)*
+
+---
+
+## Future Ideas
+
+For potential enhancements, new features, and future directions for this project, please see [`ideas.md`](./ideas.md).
