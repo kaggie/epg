@@ -87,6 +87,30 @@ Refer to the example usage within each script and the documentation in the `wiki
 
 ---
 
+## Plotting Utilities
+
+The `epg_plotting_tool.py` script (located at the root of the repository) provides functions to visualize EPG simulation results and pulse sequences:
+
+*   `plot_pulse_sequence(flip_angles, phases, TR)`: Displays the RF pulse sequence.
+*   `plot_epg_evolution(epg_states, max_display_order, batch_idx, pool_idx)`: Shows the time evolution of different k-orders for Fp, Fm, and Z states (2D plot).
+*   `plot_epg_snapshot(epg_states, time_step_idx, batch_idx, pool_idx, max_k_order)`: Displays a snapshot of Fp(k), Fm(k), and Z(k) magnitudes vs. k-order at a specific time point (2D plot).
+*   `plot_epg_F_states_3D(epg_states, batch_idx, pool_idx, component, kind)`: Provides a 3D visualization of F-state magnitudes (Fp, Fm, or both) over time and k-order (e.g., as a surface or wireframe plot).
+
+These utilities are demonstrated in the Jupyter notebooks located in the `examples/` directory.
+
+---
+
+## Examples
+
+The `examples/` directory contains Jupyter notebooks (derived from Python scripts) that demonstrate how to use the EPG simulation scripts and plotting utilities:
+
+*   **`example_basic_epg.ipynb`**: Shows how to run a basic EPG simulation using `vectorized-sims/epg_mri_vectorized.py` and visualize the pulse sequence, 2D EPG state evolution, 2D state snapshots, and 3D F-state plots.
+*   **`example_extended_epg.ipynb`**: Demonstrates an EPG simulation with Magnetization Transfer (MT) using `vectorized-sims/epg_extended_vectorized.py`. It includes visualizations for different pools and highlights MT effects.
+
+To run these examples, ensure you have Jupyter Notebook or JupyterLab installed (e.g., `pip install notebook jupyterlab`). The Python scripts (`.py`) in the `examples/` directory can be converted to notebooks (e.g., using `jupytext` or by opening them in VS Code with the Jupyter extension) or run directly, though notebooks offer a more interactive experience for visualization.
+
+---
+
 ## Future Ideas
 
 For potential enhancements, new features, and future directions for this project, please see [`ideas.md`](./ideas.md).
